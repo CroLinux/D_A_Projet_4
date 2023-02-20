@@ -19,13 +19,22 @@ public class FareCalculatorService {
         // We need to add the f for the float results (with decimals)
         double duration = ((outHour - inHour)/1000)/3600f;
 
+        // *** Here we check if the duration is less than 0.5 so less than 30 minutes.
+		if (duration < 0.5) {
+			duration = 0.0;
+		}
+
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
-                ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
+                //ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
+            double normalPrice = duration * Fare.CAR_RATE_PER_HOUR;
+            ticket.setPrice(normalPrice);
                 break;
             }
             case BIKE: {
-                ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);
+                //ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);
+            double normalPrice = duration * Fare.BIKE_RATE_PER_HOUR;
+			ticket.setPrice(normalPrice);
                 break;
             }
             default: throw new IllegalArgumentException("Unkown Parking Type");
