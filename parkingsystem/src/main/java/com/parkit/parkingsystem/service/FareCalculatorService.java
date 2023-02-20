@@ -2,10 +2,13 @@ package com.parkit.parkingsystem.service;
 
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.dao.TicketDAO;
 
 public class FareCalculatorService {
 
-    public void calculateFare(Ticket ticket){
+    TicketDAO ticketDAO = new TicketDAO();
+
+    public void calculateFare(Ticket ticket, boolean discount){
         if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
             throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
         }
@@ -24,20 +27,34 @@ public class FareCalculatorService {
 			duration = 0.0;
 		}
 
+        double discountValue = 0.00;
+        if (discount == true){
+            discountValue = 0.05;
+        }
+
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
                 //ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
             double normalPrice = duration * Fare.CAR_RATE_PER_HOUR;
-            ticket.setPrice(normalPrice);
+            //ticket.setPrice(normalPrice);
+            ticket.setPrice(priceDiscounted(discountValue, normalPrice));
                 break;
             }
             case BIKE: {
                 //ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);
             double normalPrice = duration * Fare.BIKE_RATE_PER_HOUR;
-			ticket.setPrice(normalPrice);
+			//ticket.setPrice(normalPrice);
+            ticket.setPrice(priceDiscounted(discountValue, normalPrice));
                 break;
             }
             default: throw new IllegalArgumentException("Unkown Parking Type");
         }
     }
+
+	//Here, we calculate the final price regarding the normal price calculated above and the eventual discount allowed.
+	public double priceDiscounted(double discountValuex, double normPrice) {
+		double finalPrice = normPrice - (normPrice * discountValuex);
+        System.out.println("Price returned : " + finalPrice);
+		return finalPrice;
+	}
 }
